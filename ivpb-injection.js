@@ -1,7 +1,9 @@
 const FEED_VIDEOS_SELECTORS = "main[role=main] article video";
 const REELS_VIDEOS_SELECTORS = "main[role=main] video";
-const POST_VIDEOS_SELECTOR = "main[role=main] video";
-const VIDEO_INFOS_SELECTORS = "div > div > div > div > div:nth-of-type(2) > div";
+const POST_VIDEO_SELECTORS = "main[role=main] video";
+const POST_MODAL_VIDEO_SELECTORS = "article[role=presentation] video";
+const VIDEO_INFOS_SELECTORS =
+  "div > div > div > div > div:nth-of-type(2) > div";
 const VIDEO_SOUND_BTN_SELECTORS = "div[role=button]:has(> svg)";
 const VIDEO_POST_SOUND_BTN_SELECTORS = "div:has(> button)";
 
@@ -90,6 +92,17 @@ class InstagramVideoProgressBar {
     return document.location.pathname.includes("/p");
   }
 
+  isPostModal() {
+    if (this.isPostPage()) {
+      const postArticle = document.querySelector("article[role=presentation]");
+      const isModal = Boolean(postArticle);
+
+      return isModal;
+    }
+
+    return false;
+  }
+
   addVideoProgressBar(videoEl, editOverlay = true) {
     if (videoEl && !videoEl.hasAttribute("data-processed")) {
       videoEl.controls = true;
@@ -160,11 +173,15 @@ class InstagramVideoProgressBar {
   }
 
   handlePost() {
-    this.handleNewVideos(POST_VIDEOS_SELECTOR);
+    const selectors = this.isPostModal()
+      ? POST_MODAL_VIDEO_SELECTORS
+      : POST_VIDEO_SELECTORS;
+
+    this.handleNewVideos(selectors);
   }
 
   handleReelPost() {
-    this.handleNewVideos(POST_VIDEOS_SELECTOR);
+    this.handleNewVideos(POST_VIDEO_SELECTORS);
   }
 }
 
