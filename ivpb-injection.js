@@ -109,31 +109,28 @@ class InstagramVideoProgressBar {
   }
 
   editReelOverlay(videoEl) {
-    if (videoEl.hasAttribute("data-processed")) {
-      return;
-    }
+    if (videoEl && !videoEl.hasAttribute("data-processed")) {
+      const overlay = videoEl.nextElementSibling;
+      const soundBtn = overlay.querySelector(VIDEO_SOUND_BTN_SELECTORS);
+      const infos = overlay.querySelector(VIDEO_INFOS_SELECTORS);
 
-    const overlay = videoEl.nextElementSibling;
-    const soundBtn = overlay.querySelector(VIDEO_SOUND_BTN_SELECTORS);
-    const infos = overlay.querySelector(VIDEO_INFOS_SELECTORS);
+      const parent = videoEl.parentElement;
+      parent.style.position = "relative";
 
-    const parent = videoEl.parentElement;
-    parent.style.position = "relative";
+      parent.appendChild(soundBtn);
+      parent.appendChild(infos);
 
-    parent.appendChild(soundBtn);
-    parent.appendChild(infos);
+      soundBtn.style.position = "absolute";
+      soundBtn.style.right = "16px";
+      soundBtn.style.top = "16px";
 
-    soundBtn.style.position = "absolute";
-    soundBtn.style.right = "16px";
-    soundBtn.style.top = "16px";
+      infos.style.position = "absolute";
+      infos.style.left = "16px";
+      infos.style.bottom = "80px";
+      infos.style.width = `${parent.clientWidth - 32}px`;
 
-    infos.style.position = "absolute";
-    infos.style.left = "16px";
-    infos.style.bottom = "80px";
-    infos.style.width = `${parent.clientWidth - 32}px`;
-
-    overlay.remove();
-    videoEl.setAttribute("data-processed", "true");
+      overlay.remove();
+      videoEl.setAttribute("data-processed", "true");
   }
 
   handleReels() {
