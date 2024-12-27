@@ -69,7 +69,7 @@ class InstagramVideoProgressBar {
   handleNewContent() {
     if (this.isReelsPage()) {
       this.handleReels();
-    } else if (this.isReelPost()) {
+    } else if (this.isReelPostPage()) {
       this.handleReelPost();
     } else if (this.isPostPage()) {
       this.handlePost();
@@ -82,7 +82,7 @@ class InstagramVideoProgressBar {
     return document.location.pathname.includes("/reels");
   }
 
-  isReelPost() {
+  isReelPostPage() {
     return document.location.pathname.includes("/reel");
   }
 
