@@ -3,6 +3,7 @@ const REELS_VIDEOS_SELECTORS = "main[role=main] video";
 const POST_VIDEOS_SELECTOR = "main[role=main] video";
 const VIDEO_INFOS_SELECTORS = "div > div > div > div > div:nth-of-type(2) > div";
 const VIDEO_SOUND_BTN_SELECTORS = "div[role=button]:has(> svg)";
+const VIDEO_POST_SOUND_BTN_SELECTORS = "div:has(> button)";
 
 class InstagramVideoProgressBar {
   /** @type {MutationObserver} */
@@ -89,13 +90,25 @@ class InstagramVideoProgressBar {
     return document.location.pathname.includes("/p");
   }
 
-  addVideoProgressBar(videoEl, deleteOverlay = true) {
+  addVideoProgressBar(videoEl, editOverlay = true) {
     if (videoEl && !videoEl.hasAttribute("data-processed")) {
       videoEl.controls = true;
 
-      if (deleteOverlay) {
-        const videoOverlay = videoEl.nextElementSibling;
-        if (videoOverlay) videoOverlay.remove();
+      if (editOverlay) {
+        const overlay = videoEl.nextElementSibling;
+        const soundBtn = overlay.querySelector(VIDEO_POST_SOUND_BTN_SELECTORS);
+
+        const parent = videoEl.parentElement;
+        parent.style.position = "relative";
+
+        parent.appendChild(soundBtn);
+
+        soundBtn.style.position = "absolute";
+        soundBtn.style.left = "16px";
+        soundBtn.style.right = "unset";
+        soundBtn.style.top = "16px";
+
+        overlay.remove();
       }
 
       videoEl.setAttribute("data-processed", "true");
