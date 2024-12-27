@@ -65,7 +65,7 @@ class InstagramVideoProgressBar {
     if (this.isReelsPage()) {
       this.handleReels();
     } else if (this.isReelPost()) {
-      this.handleReelPostPage();
+      this.handleReelPost();
     } else if (this.isPostPage()) {
       this.handlePost();
     } else {
@@ -148,7 +148,7 @@ class InstagramVideoProgressBar {
     this.handleNewVideos(POST_VIDEOS_SELECTOR);
   }
 
-  handleReelPostPage() {
+  handleReelPost() {
     this.handleNewVideos(POST_VIDEOS_SELECTOR);
   }
 }

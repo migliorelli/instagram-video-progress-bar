@@ -12,7 +12,7 @@
   "permissions": ["scripting", "activeTab"],
   "content_scripts": [
     {
-      "js": ["content.js"],
+      "js": ["ivpb-injection.js"],
       "matches": ["*://*.instagram.com/*"]
     }
   ]
