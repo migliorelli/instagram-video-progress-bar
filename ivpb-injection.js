@@ -6,6 +6,7 @@ const VIDEO_INFOS_SELECTORS =
 const VIDEO_SOUND_BTN_SELECTORS = "div[role=button] :has(svg) div";
 
 class InstagramVideoProgressBar {
+  /** @type {MutationObserver} */
   observer = null;
 
   initialize() {
