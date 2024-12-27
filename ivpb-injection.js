@@ -109,7 +109,7 @@ class InstagramVideoProgressBar {
   }
 
   editReelOverlay(videoEl) {
-    if (videoEl && !videoEl.hasAttribute("data-processed")) {
+    if (videoEl && !videoEl.hasAttribute("data-reel-processed")) {
       const overlay = videoEl.nextElementSibling;
       const soundBtn = overlay.querySelector(VIDEO_SOUND_BTN_SELECTORS);
       const infos = overlay.querySelector(VIDEO_INFOS_SELECTORS);
@@ -130,7 +130,8 @@ class InstagramVideoProgressBar {
       infos.style.width = `${parent.clientWidth - 32}px`;
 
       overlay.remove();
-      videoEl.setAttribute("data-processed", "true");
+      videoEl.setAttribute("data-reel-processed", "true");
+    }
   }
 
   handleReels() {
