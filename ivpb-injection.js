@@ -29,6 +29,10 @@ class InstagramVideoProgressBar {
   }
 
   initializeObserver() {
+    if (this.observer) {
+      this.observer.disconnect();
+    }
+
     this.observer = new MutationObserver((mutations) => {
       mutations.forEach((mutation) => {
         if (mutation.addedNodes.length) {
