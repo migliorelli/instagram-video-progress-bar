@@ -1,9 +1,8 @@
 const FEED_VIDEOS_SELECTORS = "main[role=main] article video";
 const REELS_VIDEOS_SELECTORS = "main[role=main] video";
 const POST_VIDEOS_SELECTOR = "main[role=main] video";
-const VIDEO_INFOS_SELECTORS =
-  "div > div > div > div > div:nth-of-type(2) > div";
-const VIDEO_SOUND_BTN_SELECTORS = "div[role=button] :has(svg) div";
+const VIDEO_INFOS_SELECTORS = "div > div > div > div > div:nth-of-type(2) > div";
+const VIDEO_SOUND_BTN_SELECTORS = "div[role=button]:has(> svg)";
 
 class InstagramVideoProgressBar {
   /** @type {MutationObserver} */
