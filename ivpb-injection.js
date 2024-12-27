@@ -108,7 +108,7 @@ class InstagramVideoProgressBar {
     elements.forEach((videoEl) => this.addVideoProgressBar(videoEl));
   }
 
-  moveReelInfos(videoEl) {
+  editReelOverlay(videoEl) {
     if (videoEl.hasAttribute("data-moved")) {
       return;
     }
@@ -141,7 +141,7 @@ class InstagramVideoProgressBar {
 
     videos.forEach((videoEl) => {
       this.addVideoProgressBar(videoEl, false);
-      this.moveReelInfos(videoEl);
+      this.editReelOverlay(videoEl);
     });
   }
 
