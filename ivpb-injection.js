@@ -109,7 +109,7 @@ class InstagramVideoProgressBar {
   }
 
   editReelOverlay(videoEl) {
-    if (videoEl.hasAttribute("data-moved")) {
+    if (videoEl.hasAttribute("data-processed")) {
       return;
     }
 
@@ -133,7 +133,7 @@ class InstagramVideoProgressBar {
     infos.style.width = `${parent.clientWidth - 32}px`;
 
     overlay.remove();
-    videoEl.setAttribute("data-moved", "true");
+    videoEl.setAttribute("data-processed", "true");
   }
 
   handleReels() {
