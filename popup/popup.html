@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        width: 200px;
+        padding: 2rem;
+        background-color: #faf9fd;
+      }
+
+      .wrapper {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        gap: 1rem;
+      }
+
+      .title {
+        font-size: x-large;
+      }
+
+      .switchContainer {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        flex-wrap: wrap;
+
+        cursor: pointer;
+      }
+
+      .switch {
+        background-color: #f0ecfa;
+
+        border-radius: 1000px;
+        width: 4rem;
+        height: 2.33rem;
+        padding-inline: 4px;
+
+        display: flex;
+        align-items: center;
+      }
+
+      .switchDot {
+        background-color: #a78aeb;
+        opacity: 0.5;
+
+        height: 1.75rem;
+        width: 1.75rem;
+        border-radius: 100px;
+
+        margin-left: 0%;
+        transition: all 200ms;
+      }
+
+      .checkbox {
+        display: none;
+      }
+
+      .checkbox:checked + .switch .switchDot {
+        margin-left: calc(100% - 1.75rem);
+        background-color: #a78aeb;
+        opacity: 1;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrapper">
+      <span class="title">Enable extension</span>
+
+      <label class="switchContainer">
+        <input type="checkbox" class="checkbox" id="toggleControls" />
+        <div class="switch">
+          <div class="switchDot" />
+        </div>
+      </label>
+    </div>
+    <script src="popup.js"></script>
+  </body>
+</html>

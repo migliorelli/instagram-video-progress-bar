@@ -11,10 +11,17 @@ class InstagramVideoProgressBar {
   /** @type {MutationObserver} */
   observer = null;
 
-  initialize() {
-    console.log("Instagram Video Progress Bar intialized!");
+  start() {
     this.handleUrlChanges();
     this.initializeObserver();
+    console.log("Instagram Video Progress Bar started!");
+  }
+
+  stop() {
+    this.observer.disconnect();
+    this.observer = null;
+    this.removeControls();
+    console.log("Instagram Video Progress Bar stoped!");
   }
 
   handleUrlChanges() {
@@ -103,59 +110,95 @@ class InstagramVideoProgressBar {
     return false;
   }
 
-  addVideoProgressBar(videoEl, editOverlay = true) {
-    if (videoEl && !videoEl.hasAttribute("data-processed")) {
-      videoEl.controls = true;
+  toggleControls(showControls, videoEl, editOverlay = true) {
+    const wasProcessed = videoEl.hasAttribute("data-controls-processed");
 
-      if (editOverlay) {
-        const overlay = videoEl.nextElementSibling;
-        const soundBtn = overlay.querySelector(VIDEO_POST_SOUND_BTN_SELECTORS);
+    if (showControls) {
+      if (videoEl && !wasProcessed) {
+        videoEl.controls = true;
 
-        const parent = videoEl.parentElement;
-        parent.style.position = "relative";
+        if (editOverlay) {
+          const overlay = videoEl.nextElementSibling;
+          const wasResetProcessedOnce = videoEl.hasAttribute(
+            "data-reset-processed-once"
+          );
 
-        parent.appendChild(soundBtn);
+          if (!wasResetProcessedOnce) {
+            const soundBtn = overlay.querySelector(
+              VIDEO_POST_SOUND_BTN_SELECTORS
+            );
 
-        soundBtn.style.position = "absolute";
-        soundBtn.style.left = "16px";
-        soundBtn.style.right = "unset";
-        soundBtn.style.top = "16px";
+            const parent = videoEl.parentElement;
+            parent.style.position = "relative";
 
-        overlay.remove();
+            parent.appendChild(soundBtn);
+
+            soundBtn.style.position = "absolute";
+            soundBtn.style.left = "16px";
+            soundBtn.style.right = "unset";
+            soundBtn.style.top = "16px";
+          }
+
+          // overlay.remove();
+          overlay.style.display = "none";
+        }
+
+        videoEl.setAttribute("data-controls-processed", "true");
+        videoEl.removeAttribute("data-reset-processed");
       }
+    } else {
+      const wasReseted = videoEl.hasAttribute("data-reset-processed");
 
-      videoEl.setAttribute("data-processed", "true");
+      if (videoEl && wasProcessed && !wasReseted) {
+        videoEl.controls = false;
+        const overlay = videoEl.nextElementSibling;
+        overlay.style.display = "block";
+
+        videoEl.setAttribute("data-reset-processed", "true");
+        videoEl.setAttribute("data-reset-processed-once", "true");
+        videoEl.removeAttribute("data-controls-processed");
+      }
     }
   }
 
   handleNewVideos(selectors) {
     const elements = document.querySelectorAll(selectors);
-    elements.forEach((videoEl) => this.addVideoProgressBar(videoEl));
+    elements.forEach((videoEl) => this.toggleControls(true, videoEl));
   }
 
   editReelOverlay(videoEl) {
-    if (videoEl && !videoEl.hasAttribute("data-reel-processed")) {
+    const wasOverlayProcessed = videoEl.hasAttribute("data-reel-overlay-processed");
+
+    if (videoEl && !wasOverlayProcessed) {
       const overlay = videoEl.nextElementSibling;
-      const soundBtn = overlay.querySelector(VIDEO_SOUND_BTN_SELECTORS);
-      const infos = overlay.querySelector(VIDEO_INFOS_SELECTORS);
+      const wasResetProcessedOnce = videoEl.hasAttribute(
+        "data-reset-processed-once"
+      );
 
-      const parent = videoEl.parentElement;
-      parent.style.position = "relative";
+      if (!wasResetProcessedOnce) {
+        const soundBtn = overlay.querySelector(VIDEO_SOUND_BTN_SELECTORS);
+        const infos = overlay.querySelector(VIDEO_INFOS_SELECTORS);
 
-      parent.appendChild(soundBtn);
-      parent.appendChild(infos);
+        const parent = videoEl.parentElement;
+        parent.style.position = "relative";
 
-      soundBtn.style.position = "absolute";
-      soundBtn.style.right = "16px";
-      soundBtn.style.top = "16px";
+        parent.appendChild(soundBtn);
+        parent.appendChild(infos);
 
-      infos.style.position = "absolute";
-      infos.style.left = "16px";
-      infos.style.bottom = "80px";
-      infos.style.width = `${parent.clientWidth - 32}px`;
+        soundBtn.style.position = "absolute";
+        soundBtn.style.right = "16px";
+        soundBtn.style.top = "16px";
 
-      overlay.remove();
-      videoEl.setAttribute("data-reel-processed", "true");
+        infos.style.position = "absolute";
+        infos.style.left = "16px";
+        infos.style.bottom = "80px";
+        infos.style.width = `${parent.clientWidth - 32}px`;
+      }
+
+      // overlay.remove();
+      overlay.style.display = "none";
+      videoEl.removeAttribute("data-reset-processed");
+      videoEl.setAttribute("data-reel-overlay-processed", "true");
     }
   }
 
@@ -163,7 +206,7 @@ class InstagramVideoProgressBar {
     const videos = document.querySelectorAll(REELS_VIDEOS_SELECTORS);
 
     videos.forEach((videoEl) => {
-      this.addVideoProgressBar(videoEl, false);
+      this.toggleControls(true, videoEl, false);
       this.editReelOverlay(videoEl);
     });
   }
@@ -183,9 +226,34 @@ class InstagramVideoProgressBar {
   handleReelPost() {
     this.handleNewVideos(POST_VIDEO_SELECTORS);
   }
+
+  removeControls() {
+    const videos = document.querySelectorAll("video");
+    videos.forEach((video) => this.toggleControls(false, video));
+  }
 }
 
 window.addEventListener("load", () => {
-  const IVP = new InstagramVideoProgressBar();
-  IVP.initialize();
+  let enabled = true;
+  const app = new InstagramVideoProgressBar();
+
+  chrome.storage.local.get("enabled", (data) => {
+    enabled = data.enabled ?? true;
+
+    if (data.enabled) {
+      app.start();
+    }
+  });
+
+  chrome.runtime.onMessage.addListener((request) => {
+    if (request.action == "toggleControls") {
+      enabled = request.enabled ?? true;
+
+      if (enabled) {
+        app.start();
+      } else {
+        app.stop();
+      }
+    }
+  });
 });

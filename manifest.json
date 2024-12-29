@@ -9,11 +9,14 @@
     "48": "images/icon-48.png",
     "128": "images/icon-128.png"
   },
-  "permissions": ["scripting", "activeTab"],
+  "permissions": ["scripting", "activeTab", "storage"],
   "content_scripts": [
     {
       "js": ["ivpb-injection.js"],
       "matches": ["*://*.instagram.com/*"]
     }
-  ]
+  ],
+  "action": {
+    "default_popup": "popup/popup.html"
+  }
 }
