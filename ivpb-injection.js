@@ -63,11 +63,17 @@ class InstagramVideoProgressBar {
 
   async waitForContent() {
     return new Promise((resolve) => {
+      let attempts = 0;
+      const maxAttempts = 30; // 30 second timout
+
       const checkContent = () => {
         const container = document.querySelector("main[role=main]");
         if (container) {
           resolve(container);
+        } else if (attempts >= maxAttempts) {
+          reject(new Error("Timeout waiting for main container"));
         } else {
+          attempts++;
           setTimeout(checkContent, 1000);
         }
       };
