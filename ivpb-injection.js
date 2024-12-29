@@ -10,6 +10,7 @@ const VIDEO_POST_SOUND_BTN_SELECTORS = "div:has(> button)";
 class InstagramVideoProgressBar {
   /** @type {MutationObserver} */
   observer = null;
+  volume = 1;
 
   start() {
     this.handleUrlChanges();
@@ -116,12 +117,17 @@ class InstagramVideoProgressBar {
     return false;
   }
 
-  toggleControls(showControls, videoEl, editOverlay = true) {
+  processVideo(showControls, videoEl, editOverlay = true) {
     const wasProcessed = videoEl.hasAttribute("data-controls-processed");
+
+    if (videoEl.volume !== this.volume) {
+      videoEl.volume = this.volume;
+    }
 
     if (showControls) {
       if (videoEl && !wasProcessed) {
         videoEl.controls = true;
+        this.setupVideoListeners(videoEl);
 
         if (editOverlay) {
           const overlay = videoEl.nextElementSibling;
@@ -169,11 +175,13 @@ class InstagramVideoProgressBar {
 
   handleNewVideos(selectors) {
     const elements = document.querySelectorAll(selectors);
-    elements.forEach((videoEl) => this.toggleControls(true, videoEl));
+    elements.forEach((videoEl) => this.processVideo(true, videoEl));
   }
 
   editReelOverlay(videoEl) {
-    const wasOverlayProcessed = videoEl.hasAttribute("data-reel-overlay-processed");
+    const wasOverlayProcessed = videoEl.hasAttribute(
+      "data-reel-overlay-processed"
+    );
 
     if (videoEl && !wasOverlayProcessed) {
       const overlay = videoEl.nextElementSibling;
@@ -212,7 +220,7 @@ class InstagramVideoProgressBar {
     const videos = document.querySelectorAll(REELS_VIDEOS_SELECTORS);
 
     videos.forEach((videoEl) => {
-      this.toggleControls(true, videoEl, false);
+      this.processVideo(true, videoEl, false);
       this.editReelOverlay(videoEl);
     });
   }
@@ -233,9 +241,59 @@ class InstagramVideoProgressBar {
     this.handleNewVideos(POST_VIDEO_SELECTORS);
   }
 
+  setVolume(volume) {
+    this.volume = volume;
+  }
+
+  updateAllVideosVolume(excludeVideo = null) {
+    const videos = document.querySelectorAll("video");
+    videos.forEach((video) => {
+      if (video !== excludeVideo && video.volume !== this.volume) {
+        video.volume = this.volume;
+      }
+    });
+  }
+
+  setupVideoListeners(videoEl) {
+    const volumeChangeHandler = (e) => {
+      if (e.target.volume !== this.volume) {
+        this.volume = e.target.volume;
+        chrome.storage.local.set({ volume: this.volume });
+        this.updateAllVideosVolume(videoEl);
+      }
+    };
+
+    const playHandler = () => {
+      if (videoEl.volume !== this.volume) {
+        videoEl.volume = this.volume;
+      }
+    };
+
+    videoEl.addEventListener("volumechange", volumeChangeHandler);
+    videoEl.addEventListener("play", playHandler);
+
+    videoEl.dataset.handlers = JSON.stringify({
+      volumechange: volumeChangeHandler,
+      play: playHandler,
+    });
+  }
+
   removeControls() {
     const videos = document.querySelectorAll("video");
-    videos.forEach((video) => this.toggleControls(false, video));
+    videos.forEach((video) => {
+      if (video.dataset.handlers) {
+        const handlers = JSON.parse(video.dataset.handlers);
+        Object.entries(handlers).forEach(([event, handler]) => {
+          video.removeEventListener(event, handler);
+        });
+        delete video.dataset.handlers;
+      }
+      this.processVideo(false, video);
+    });
+
+    chrome.storage.local.set({ volume: 1 });
+    this.volume = 1;
+    this.updateAllVideosVolume();
   }
 }
 
@@ -243,8 +301,9 @@ window.addEventListener("load", () => {
   let enabled = true;
   const app = new InstagramVideoProgressBar();
 
-  chrome.storage.local.get("enabled", (data) => {
+  chrome.storage.local.get(["enabled", "volume"], (data) => {
     enabled = data.enabled ?? true;
+    app.setVolume(data.volume ?? 1);
 
     if (data.enabled) {
       app.start();
