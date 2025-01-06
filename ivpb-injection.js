@@ -123,14 +123,17 @@ class InstagramVideoProgressBar {
   }
 
   processVideo(showControls, videoEl, editOverlay = true) {
-    const wasProcessed = videoEl.hasAttribute("data-controls-processed");
+    if (!videoEl) {
+      return;
+    }
 
     if (videoEl.volume !== this.volume) {
       videoEl.volume = this.volume;
     }
 
     if (showControls) {
-      if (videoEl && !wasProcessed) {
+      const wasProcessed = videoEl.hasAttribute("data-controls-processed");
+      if (!wasProcessed) {
         videoEl.controls = true;
         this.setupVideoListeners(videoEl);
 
