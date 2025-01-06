@@ -254,8 +254,13 @@ class InstagramVideoProgressBar {
     // move the bottom controls up if the it has a parent and it's parent has childrens
     const controlsContainer = parentElement?.nextElementSibling;
     if (controlsContainer && controlsContainer.children.length > 0) {
-      const bottomControls = controlsContainer.children[0];
-      bottomControls.style.bottom = "80px";
+      const bottomControlsParent = controlsContainer.children[0];
+      bottomControlsParent.style.backgroundImage =
+        "linear-gradient(180deg, rgba(38, 38, 38, 0) 0%, rgba(38, 38, 38, .3) 25%)";
+
+      const bottomControls = bottomControlsParent.children[0];
+      bottomControls.style.marginBottom = "60px";
+
       videoEl.setAttribute("data-stories-processed", "true");
     }
   }
