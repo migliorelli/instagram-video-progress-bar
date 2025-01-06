@@ -73,7 +73,8 @@ class InstagramVideoProgressBar {
       const maxAttempts = 30; // 30 second timout
 
       const checkContent = () => {
-        const container = document.querySelector("main[role=main]");
+        const container = document.querySelector(`div[id*="mount"]`);
+
         if (container) {
           resolve(container);
         } else if (attempts >= maxAttempts) {
@@ -88,7 +89,9 @@ class InstagramVideoProgressBar {
   }
 
   handleNewContent() {
-    if (this.isReelsPage()) {
+    if (this.isStories()) {
+      this.handleStories();
+    } else if (this.isReelsPage()) {
       this.handleReels();
     } else if (this.isReelPostPage()) {
       this.handleReelPost();
@@ -109,6 +112,10 @@ class InstagramVideoProgressBar {
 
   isPostPage() {
     return document.location.pathname.includes("/p");
+  }
+
+  isStories() {
+    return document.location.pathname.includes("/stories");
   }
 
   isPostModal() {
@@ -181,6 +188,49 @@ class InstagramVideoProgressBar {
     }
   }
 
+  /**
+   *
+   * @param {HTMLVideoElement} videoEl
+   */
+  processStories(videoEl) {
+    if (!videoEl) {
+      return;
+    }
+
+    // check if stories have already been processed
+    if (videoEl.hasAttribute("data-stories-processed")) {
+      return;
+    }
+
+    // hide video overlay if exists
+    const videoOverlay = videoEl.nextElementSibling;
+    if (videoOverlay) {
+      videoOverlay.style.display = "none";
+    }
+
+    // traverse up to find the bottom controls container
+    let parentElement = videoEl;
+    for (let i = 0; i < 10; i++) {
+      if (parentElement) {
+        parentElement = parentElement.parentElement;
+      }
+    }
+
+    // validate controls container
+    const controlsContainer = parentElement?.nextElementSibling;
+    if (!controlsContainer || controlsContainer.children.length === 0) {
+      return;
+    }
+
+    const bottomControls = controlsContainer.children[0];
+
+    // adjust the position of the bottom controls
+    if (bottomControls) {
+      bottomControls.style.bottom = "80px";
+      videoEl.setAttribute("data-stories-processed", "true");
+    }
+  }
+
   handleNewVideos(selectors) {
     const elements = document.querySelectorAll(selectors);
     elements.forEach((videoEl) => this.processVideo(true, videoEl));
@@ -243,6 +293,15 @@ class InstagramVideoProgressBar {
     //   : POST_VIDEO_SELECTORS;
 
     this.handleNewVideos(POST_VIDEO_SELECTORS);
+  }
+
+  handleStories() {
+    const videos = document.querySelectorAll("video");
+
+    videos.forEach((videoEl) => {
+      this.processVideo(true, videoEl, false);
+      this.processStories(videoEl);
+    });
   }
 
   handleReelPost() {
