@@ -307,7 +307,7 @@ window.addEventListener("load", () => {
     enabled = data.enabled ?? true;
     app.setVolume(data.volume ?? 1);
 
-    if (data.enabled) {
+    if (enabled) {
       app.start();
     }
   });
