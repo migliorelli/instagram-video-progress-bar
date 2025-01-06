@@ -65,7 +65,7 @@ class InstagramVideoProgressBar {
   }
 
   async waitForContent() {
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
       let attempts = 0;
       const maxAttempts = 30; // 30 second timout
 
