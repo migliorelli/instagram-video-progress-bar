@@ -30,14 +30,17 @@ class InstagramVideoProgressBar {
   handleUrlChanges() {
     let lastUrl = location.href;
 
-    new MutationObserver(() => {
+    const urlObserverCallback = () => {
       const url = location.href;
       if (url !== lastUrl) {
         lastUrl = url;
         console.log("URL changed:", url);
         this.initializeObserver();
       }
-    }).observe(document, { subtree: true, childList: true });
+    };
+
+    const urlObserver = new MutationObserver(urlObserverCallback);
+    urlObserver.observe(document, { subtree: true, childList: true });
   }
 
   initializeObserver() {
