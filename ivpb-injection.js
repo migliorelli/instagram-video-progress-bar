@@ -186,7 +186,7 @@ class InstagramVideoProgressBar {
     elements.forEach((videoEl) => this.processVideo(true, videoEl));
   }
 
-  editReelOverlay(videoEl) {
+  processReels(videoEl) {
     const wasOverlayProcessed = videoEl.hasAttribute(
       "data-reel-overlay-processed"
     );
@@ -229,7 +229,7 @@ class InstagramVideoProgressBar {
 
     videos.forEach((videoEl) => {
       this.processVideo(true, videoEl, false);
-      this.editReelOverlay(videoEl);
+      this.processReels(videoEl);
     });
   }
 
