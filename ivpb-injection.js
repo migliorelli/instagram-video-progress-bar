@@ -193,7 +193,9 @@ class InstagramVideoProgressBar {
    * @param {Boolean} editOverlay Whether to edit the overlay (default: true).
    */
   processVideo(showControls, videoEl, editOverlay = true) {
-    if (!videoEl) return;
+    if (!videoEl) {
+      return;
+    }
 
     if (videoEl.volume !== this.volume) {
       videoEl.volume = this.volume;
@@ -207,9 +209,28 @@ class InstagramVideoProgressBar {
 
         if (editOverlay) {
           const overlay = videoEl.nextElementSibling;
-          if (overlay) {
-            overlay.style.display = "none";
+          const wasResetProcessedOnce = videoEl.hasAttribute(
+            "data-reset-processed-once"
+          );
+
+          if (!wasResetProcessedOnce) {
+            const soundBtn = overlay.querySelector(
+              VIDEO_POST_SOUND_BTN_SELECTORS
+            );
+
+            const parent = videoEl.parentElement;
+            parent.style.position = "relative";
+
+            parent.appendChild(soundBtn);
+
+            soundBtn.style.position = "absolute";
+            soundBtn.style.left = "16px";
+            soundBtn.style.right = "unset";
+            soundBtn.style.top = "16px";
           }
+
+          // overlay.remove();
+          overlay.style.display = "none";
         }
 
         videoEl.setAttribute("data-controls-processed", "true");
@@ -217,16 +238,61 @@ class InstagramVideoProgressBar {
       }
     } else {
       const wasReseted = videoEl.hasAttribute("data-reset-processed");
-      if (!wasReseted) {
+
+      if (videoEl && wasProcessed && !wasReseted) {
         videoEl.controls = false;
         const overlay = videoEl.nextElementSibling;
-        if (overlay) {
-          overlay.style.display = "block";
-        }
+        overlay.style.display = "block";
 
         videoEl.setAttribute("data-reset-processed", "true");
+        videoEl.setAttribute("data-reset-processed-once", "true");
         videoEl.removeAttribute("data-controls-processed");
       }
+    }
+  }
+
+  /**
+   * Handles Reels videos, adjusting overlays and bottom controls positioning.
+   *
+   * @param {HTMLVideoElement} videoEl The video element to process.
+   */
+  processReels(videoEl) {
+    const wasOverlayProcessed = videoEl.hasAttribute(
+      "data-reel-overlay-processed"
+    );
+
+    if (videoEl && !wasOverlayProcessed) {
+      const overlay = videoEl.nextElementSibling;
+      const wasResetProcessedOnce = videoEl.hasAttribute(
+        "data-reset-processed-once"
+      );
+
+      if (!wasResetProcessedOnce) {
+        const soundBtn = overlay.querySelector(VIDEO_REELS_SOUND_BTN_SELECTORS);
+        const bottomOverlay = overlay.querySelector(
+          VIDEO_REELS_BOTTOM_OVERLAY_SELECTORS
+        );
+
+        const parent = videoEl.parentElement;
+        parent.style.position = "relative";
+
+        parent.appendChild(soundBtn);
+        parent.appendChild(bottomOverlay);
+
+        soundBtn.style.position = "absolute";
+        soundBtn.style.right = "16px";
+        soundBtn.style.top = "16px";
+
+        bottomOverlay.style.position = "absolute";
+        bottomOverlay.style.left = "16px";
+        bottomOverlay.style.bottom = "80px";
+        bottomOverlay.style.width = `${parent.clientWidth - 32}px`;
+      }
+
+      // overlay.remove();
+      overlay.style.display = "none";
+      videoEl.removeAttribute("data-reset-processed");
+      videoEl.setAttribute("data-reel-overlay-processed", "true");
     }
   }
 
